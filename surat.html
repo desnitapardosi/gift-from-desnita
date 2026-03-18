@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surat Interaktif 💌</title>
+
+<style>
+body{ 
+  margin:0; 
+  height:100vh; 
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  flex-direction:column; 
+  font-family:Arial; 
+  text-align:center; 
+  background-color:#406181; 
+  transition: background 1s ease, opacity 1.5s ease; 
+}
+
+h1{ 
+  color:white; 
+  text-shadow:2px 2px 10px rgba(0,0,0,0.5); 
+  margin-bottom:20px; 
+}
+
+.envelope{ 
+  font-size:120px; 
+  cursor:pointer; 
+  transition:0.3s; 
+}
+
+.envelope:hover{ transform:scale(1.1); }
+
+.frame{ 
+  background: rgba(255,255,255,0.95); 
+  padding:15px; 
+  border-radius:15px; 
+  box-shadow:0 15px 40px rgba(0,0,0,0.3); 
+  display:none; 
+  position:relative; 
+  top:-300px; 
+  opacity:0; 
+  transition: top 1.5s ease, opacity 1.5s ease; 
+}
+
+.letter{ 
+  width:700px; 
+  max-width:90vw; 
+  padding:40px; 
+  border-radius:10px; 
+  line-height:1.8; 
+  font-size:18px; 
+  color:#333; 
+  text-align:justify; 
+}
+
+.sign{ margin-top:20px; font-weight:bold; color:#444; }
+
+.nextBtn{ 
+  margin-top:20px; 
+  padding:10px 20px; 
+  border:none; 
+  border-radius:10px; 
+  background:#4da6ff; 
+  color:white; 
+  font-size:16px; 
+  cursor:pointer; 
+  display:none; 
+  transition:0.3s; 
+}
+
+.nextBtn:hover{ transform:scale(1.1); background:#7ec8ff; }
+
+/* tombol chat */
+#chatBtn{
+  background:#ff7aa2;
+}
+
+#chatBtn:hover{
+  background:#ff4f87;
+}
+</style>
+</head>
+<body>
+
+<h1>💌 A Letter For You</h1>
+
+<div id="envelope" class="envelope" onclick="openLetter()">📩</div>
+
+<div id="frame" class="frame">
+  <div class="letter">
+    <p id="text"></p>
+    <div id="sign" class="sign"></div>
+  </div>
+
+  <button id="nextBtn" class="nextBtn" onclick="showFrench()">Next → French 🇫🇷</button>
+  <button id="chatBtn" class="nextBtn" onclick="goToChat()">Open Chat 💬</button>
+</div>
+
+<script>
+let messageEnglish = `Hi beibb, this is a small gift from me. I may not be able to give you something truly special, but I hope this can feel a little special. Everyone deserves to be celebrated, and you do too. Happy Birthday sayangg akuu. Keep being a kind person and stay close to people who are kind to you. Even though I cannot see you, I hope you stay happy and enjoy every journey in your life. Don't forget to smile through every challenge you face. I’m happy that I got to know you even if we met in a situation that wasn’t possible. But I’m still grateful to have known you. Sorry if sometimes I’m a little hyperactive for someone who might want a calm life. I’ve learned that sometimes people need time for themselves. This is just a little code I made for you while I was working on many codes hahaha. I hope one day we can meet, maybe as friends.`;
+
+let messageFrench = `Salut beibb, Voici un petit cadeau de ma part. Je ne peux peut-être pas t’offrir quelque chose de vraiment spécial, mais j’espère que cela te fera sentir que c’est un peu spécial. Tout le monde mérite d’être célébré, et toi aussi. Joyeux anniversaire mon cher 🎂. Reste une personne gentille et proche des gens qui sont bons pour toi. Même si je ne peux pas te voir, j’espère que tu resteras heureux et que tu profiteras de chaque moment de ta vie. N’oublie pas de sourire face aux obstacles que tu rencontres. Je suis heureuse de t’avoir rencontré, même si c’était dans des circonstances difficiles, et je suis reconnaissante de t’avoir connu. Désolée si parfois je suis un peu hyperactive pour quelqu’un qui préfère une vie tranquille. J’ai appris que chacun a besoin de temps pour soi-même. Ceci est juste un petit code pour toi pendant que je travaillais sur mes codes haha. J’espère qu’un jour nous pourrons nous rencontrer, peut-être comme amis.`;
+
+let index=0;
+let currentMessage = messageEnglish;
+let typingSpeed = 60;
+
+function typeText(){
+  if(index<currentMessage.length){
+    document.getElementById("text").innerHTML += currentMessage.charAt(index);
+    index++;
+    setTimeout(typeText, typingSpeed);
+  } else {
+    document.getElementById("sign").innerHTML="With big love 💖";
+
+    if(currentMessage===messageEnglish){
+      setTimeout(()=>{ 
+        document.getElementById("nextBtn").style.display="block"; 
+      }, 500);
+    } else {
+      setTimeout(()=>{ 
+        document.getElementById("chatBtn").style.display="block"; 
+      }, 500);
+    }
+  }
+}
+
+function openLetter(){
+  document.body.style.backgroundImage = "url('https://i.pinimg.com/1200x/15/44/f4/1544f47f14a2c56868ed825c800d7e15.jpg')";
+  
+  document.getElementById("envelope").style.display="none";
+
+  let frame = document.getElementById("frame");
+  frame.style.display="block";
+
+  setTimeout(()=>{ 
+    frame.style.top="0px"; 
+    frame.style.opacity="1"; 
+  }, 300);
+
+  currentMessage = messageEnglish;
+  index=0;
+  document.getElementById("text").innerHTML="";
+  document.getElementById("sign").innerHTML="";
+  document.getElementById("nextBtn").style.display="none";
+  document.getElementById("chatBtn").style.display="none";
+
+  typeText();
+}
+
+function showFrench(){
+  currentMessage = messageFrench;
+  index=0;
+  document.getElementById("text").innerHTML="";
+  document.getElementById("sign").innerHTML="";
+  document.getElementById("nextBtn").style.display="none";
+  document.getElementById("chatBtn").style.display="none";
+
+  typeText();
+}
+
+function goToChat(){
+  document.body.style.opacity="0";
+
+  setTimeout(()=>{
+    window.location.href="chat.html";
+  },1500);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hadiah Untukmu 💙</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Arial;
+  text-align:center;
+  background-image:url("https://i.pinimg.com/736x/15/33/28/1533284d06119b087f540139c7916a96.jpg");
+  background-size:cover;
+  background-position:center;
+  
+}
+
+.card{
+  background:#7bb3e1d9;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.2);
+  max-width:420px;
+}
+
+.gift{ font-size:90px; cursor:pointer; transition:0.3s; }
+.gift:hover{ transform:scale(1.15); }
+
+#message{ margin-top:20px; font-size:18px; line-height:1.6; min-height:80px; }
+#music{ display:none; margin:25px auto; width:85%; }
+
+.nextBtn{ margin:20px auto; padding:12px 25px; border:none; border-radius:10px; background:#4da6ff; color:white; font-size:16px; cursor:pointer; display:none; }
+.nextBtn:hover{ transform:scale(1.1); background:#e5e8ec; }
+
+#transition{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:black; opacity:1;
+  pointer-events:none;
+  transition:opacity 2.5s ease;
+  z-index:999;
+}
+</style>
+</head>
+<body>
+
+<div id="transition"></div>
+
+<div class="card">
+<h2>🎁 There's a gift for you</h2>
+<div id="gift" class="gift" onclick="openGift()">🎁</div>
+<p id="message"></p>
+
+<audio id="music">
+  <source src="songgg.mp3" type="audio/mpeg">
+</audio>
+
+<button class="nextBtn" onclick="goToCake()">Lihat Surprise Selanjutnya 🎂</button>
+</div>
+
+<script>
+let text="listen this song till the end so you get a surprise from me even if you don't like songs like this, this is one of my favorite songs.";
+let index=0;
+
+function typeText(){
+  if(index < text.length){
+    document.getElementById("message").innerHTML += text.charAt(index);
+    index++;
+    setTimeout(typeText,40);
+  } else {
+    let music=document.getElementById("music");
+    music.style.display="block";
+    music.play();
+    music.onended=function(){
+      document.querySelector(".nextBtn").style.display="block";
+    }
+  }
+}
+
+function openGift(){
+  document.getElementById("gift").innerHTML="🎉";
+  typeText();
+  confetti({particleCount:150,spread:90,origin:{y:0.6}});
+}
+
+function goToCake(){
+  let trans=document.getElementById("transition");
+  trans.style.opacity="1";
+  setTimeout(()=>{ window.location.href="kue.html"; },2500);
+}
+
+window.onload=function(){
+  let trans=document.getElementById("transition");
+  setTimeout(()=>{ trans.style.opacity="0"; },200);
+}
+</script>
+
+</body>
+</html>

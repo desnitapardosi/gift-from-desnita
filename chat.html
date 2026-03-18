@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realtime Chat 💬</title>
+<style>
+body{margin:0;font-family:sans-serif;background:linear-gradient(135deg,#4d87ae,#6d8ba3);display:flex;justify-content:center;align-items:center;height:100vh;transition: opacity 0.5s;}
+body.fade-out{opacity:0;}
+.container{
+    width:95%;max-width:600px;height:90vh;background:white;border-radius:25px;display:flex;flex-direction:column;overflow:hidden;
+}
+.header{background:#6793c2;color:white;padding:15px;text-align:center;font-size:20px;}
+.chat-box{flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.message{padding:10px 15px;border-radius:15px;max-width:70%;}
+.me{background:#92bcd7;align-self:flex-end;}
+.other{background:#eee;align-self:flex-start;}
+.input-area{display:flex;padding:10px;border-top:1px solid #ddd;gap:10px;}
+input{padding:10px;border-radius:10px;border:1px solid #ccc;}
+#name{width:30%;}
+#message{flex:1;}
+button{padding:10px 15px;border:none;background:#8dc2fd;color:white;border-radius:10px;cursor:pointer;}
+button.photobooth{background:#8dc2fd;}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">Type your message</div>
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="input-area">
+        <input type="text" id="name" placeholder="Your name">
+        <input type="text" id="message" placeholder="Write a message...">
+        <button onclick="sendMessage()">Send</button>
+        <button class="photobooth" onclick="goToPhotobooth()">Photobooth</button>
+    </div>
+</div>
+
+<script type="module">
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+// Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDl5m_yfdieYKDsh2819GW-xMMfYAV4ZMg",
+  authDomain: "desnita-project.firebaseapp.com",
+  projectId: "desnita-project",
+  storageBucket: "desnita-project.firebasestorage.app",
+  messagingSenderId: "477017895260",
+  appId: "1:477017895260:web:519284eb1b9d173dab5199",
+  measurementId: "G-R6Q29VNGXQ"
+};
+
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getFirestore(app);
+
+const chatBox = document.getElementById("chatBox");
+document.getElementById("name").value = localStorage.getItem("name") || "";
+
+// Realtime listener
+const q = query(collection(db, "chat"), orderBy("time"));
+onSnapshot(q, snapshot=>{
+    chatBox.innerHTML="";
+    snapshot.forEach(doc=>{
+        const data=doc.data();
+        const myName=localStorage.getItem("name");
+        let div=document.createElement("div");
+        div.classList.add("message");
+        div.classList.add(data.name===myName?"me":"other");
+        div.innerHTML=`<b>${data.name}</b><br>${data.text}`;
+        chatBox.appendChild(div);
+    });
+    chatBox.scrollTop=chatBox.scrollHeight;
+});
+
+// Send message
+window.sendMessage = async function(){
+    const name = document.getElementById("name").value.trim();
+    const message = document.getElementById("message").value.trim();
+    if(!name || !message){alert("Please enter your name and message!"); return;}
+    localStorage.setItem("name", name);
+    await addDoc(collection(db, "chat"), {name,text:message,time:serverTimestamp()});
+    document.getElementById("message").value="";
+}
+
+// Enter untuk kirim
+document.getElementById("message").addEventListener("keypress",e=>{
+    if(e.key==="Enter") sendMessage();
+});
+
+// Fungsi pindah ke Photobooth (fade effect)
+window.goToPhotobooth = function(){
+    document.body.classList.add("fade-out");
+    setTimeout(()=>{window.location.href="photobooth.html"},500);
+}
+</script>
+</body>
+</html>

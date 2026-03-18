@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photobooth Aesthetic</title>
+
+<style>
+body{
+font-family: Arial;
+text-align:center;
+background-image:url("https://i.pinimg.com/736x/c5/d1/2b/c5d12b9799d82a191dee09635271cded.jpg");
+background-size:cover;
+}
+
+/* KAMERA */
+video{
+width:300px;
+border-radius:20px;
+border:5px solid white;
+margin-top:20px;
+}
+
+/* BUTTON */
+button{
+padding:10px;
+margin:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+.take{background:#8dc2fd;color:white;}
+.download{background:#8dc2fd;color:white;}
+.delete{
+position:absolute;
+bottom:5px;
+right:5px;
+background:#e11010;
+color:white;
+font-size:12px;
+}
+
+/* BOX */
+.photobox{
+margin:auto;
+margin-top:20px;
+width:450px;
+padding:20px;
+border-radius:20px;
+background:rgba(152, 94, 94, 0.85);
+}
+
+/* GRID */
+.frames{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+/* FRAME */
+.frame{
+height:180px;
+position:relative;
+overflow:hidden;
+}
+
+/* FOTO */
+.photo{
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:20px;
+}
+
+/* BENTUK */
+.f1{border-radius:60% 40% 55% 45% / 45% 60% 40% 55%; background:#ffd6ec;}
+.f2{background:white;padding:10px;}
+.f3 .photo{
+clip-path:path("M150 30 C150 -10, 250 -10, 250 80 C250 150,150 200,150 200 C150 200,50 150,50 80 C50 -10,150 -10,150 30Z");
+}
+.f4{background:#cfa0c880;border:2px solid white;}
+
+/* STIKER */
+.sticker{
+position:absolute;
+width:50px;
+cursor:grab;
+z-index:2;
+}
+
+/* FLASH */
+#flash{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgb(243, 239, 239);
+opacity:0;
+pointer-events:none;
+z-index:999;
+}
+
+canvas{display:none;}
+</style>
+</head>
+
+<body>
+
+<h2>📸 Take picture babe</h2>
+
+<video id="camera" autoplay></video><br>
+
+<button class="take" onclick="takePhoto()">📷 Take Photos</button>
+<button class="download" onclick="downloadAll()">⬇ Download</button>
+
+<br>
+<button onclick="setFilter('normal')">Normal</button>
+<button onclick="setFilter('pink')">Pink 💖</button>
+<button onclick="setFilter('vintage')">Vintage 🤎</button>
+<button onclick="setFilter('bw')">B&W 🖤</button>
+
+<br>
+<button onclick="startAutoPhoto()">⏱️ Auto (3s + 4 foto)</button>
+<button onclick="downloadStrip()">💖 Download Strip Korea</button>
+
+<br>
+<!-- Tombol kembali ke chat -->
+<button onclick="backToChat()" style="background:#8dc2fd;color:white;">⬅ Back to chat</button>
+
+<div id="timer" style="font-size:30px;color:white;"></div>
+
+<div class="photobox">
+<div class="frames">
+
+<div class="frame f1">
+<img id="photo1" class="photo">
+<img src="stiker1.jpg" class="sticker" style="top:5px;left:5px;">
+<img src="stiker2.jpg" class="sticker" style="bottom:5px;right:5px;">
+<button class="delete" onclick="deletePhoto(1)">x</button>
+</div>
+
+<div class="frame f2">
+<img id="photo2" class="photo">
+<img src="stiker3.jpg" class="sticker" style="top:5px;right:5px;">
+<img src="stiker4.jpg" class="sticker" style="bottom:5px;left:5px;">
+<button class="delete" onclick="deletePhoto(2)">x</button>
+</div>
+
+<div class="frame f3">
+<img id="photo3" class="photo">
+<img src="stiker3.jpg" class="sticker" style="top:5px;right:5px;">
+<img src="stiker1.jpg" class="sticker" style="top:5px;left:5px;">
+<button class="delete" onclick="deletePhoto(3)">x</button>
+</div>
+
+<div class="frame f4">
+<img id="photo4" class="photo">
+<img src="stiker4.jpg" class="sticker" style="bottom:5px;left:5px;">
+<img src="stiker2.jpg" class="sticker" style="bottom:5px;right:5px;">
+<button class="delete" onclick="deletePhoto(4)">x</button>
+</div>
+
+</div>
+</div>
+
+<div id="flash"></div>
+<canvas id="canvas"></canvas>
+
+<script>
+let video=document.getElementById("camera")
+let canvas=document.getElementById("canvas")
+let ctx=canvas.getContext("2d")
+
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream=>{video.srcObject=stream})
+
+/* FILTER */
+let currentFilter="normal"
+function setFilter(type){
+currentFilter=type
+if(type=="pink"){
+video.style.filter="contrast(1.05) saturate(1.3) hue-rotate(-10deg)"
+}
+else if(type=="vintage"){
+video.style.filter="sepia(0.6) contrast(1.1)"
+}
+else if(type=="bw"){
+video.style.filter="grayscale(1)"
+}
+else{
+video.style.filter="none"
+}
+}
+
+/* FLASH */
+function flashEffect(){
+let flash=document.getElementById("flash")
+flash.style.opacity="1"
+setTimeout(()=>{flash.style.opacity="0"},150)
+}
+
+function takePhoto(){
+canvas.width=video.videoWidth
+canvas.height=video.videoHeight
+flashEffect()
+if(currentFilter=="pink"){ctx.filter="contrast(1.05) saturate(1.3) hue-rotate(-10deg)"}
+else if(currentFilter=="vintage"){ctx.filter="sepia(0.6) contrast(1.1)"}
+else if(currentFilter=="bw"){ctx.filter="grayscale(1)"}
+else{ctx.filter="none"}
+ctx.drawImage(video,0,0)
+ctx.filter="none"
+let img=canvas.toDataURL("image/png")
+for(let i=1;i<=4;i++){
+let photo=document.getElementById("photo"+i)
+if(photo.src=="" || photo.src==window.location.href){
+photo.src=img
+return
+}
+}
+alert("Frame penuh")
+}
+
+function deletePhoto(num){
+document.getElementById("photo"+num).src=""
+}
+
+/* DRAG STIKER */
+let active=null, offsetX=0, offsetY=0
+document.querySelectorAll(".sticker").forEach(sticker=>{
+sticker.addEventListener("mousedown",(e)=>{
+active=sticker
+let rect=sticker.getBoundingClientRect()
+offsetX=e.clientX - rect.left
+offsetY=e.clientY - rect.top
+})
+})
+document.addEventListener("mousemove",(e)=>{
+if(active){
+let parent=active.parentElement
+let rect=parent.getBoundingClientRect()
+let x=e.clientX - rect.left - offsetX
+let y=e.clientY - rect.top - offsetY
+x=Math.max(0, Math.min(x, parent.clientWidth-50))
+y=Math.max(0, Math.min(y, parent.clientHeight-50))
+active.style.left=x+"px"
+active.style.top=y+"px"
+}
+})
+document.addEventListener("mouseup",()=>{active=null})
+
+/* AUTO PHOTO */
+let autoPhotos=[]
+let timerText=document.getElementById("timer")
+function startAutoPhoto(){
+autoPhotos=[]
+let count=3
+timerText.innerText=count
+let t=setInterval(()=>{
+count--
+timerText.innerText=count
+if(count==0){
+clearInterval(t)
+timerText.innerText="📸"
+takeSequence()
+}
+},1000)
+}
+function takeSequence(){
+let i=0
+let interval=setInterval(()=>{
+canvas.width=video.videoWidth
+canvas.height=video.videoHeight
+flashEffect()
+ctx.drawImage(video,0,0)
+let img=canvas.toDataURL("image/png")
+autoPhotos.push(img)
+if(i<4){document.getElementById("photo"+(i+1)).src=img}
+i++
+if(i==4){clearInterval(interval); timerText.innerText="Done 💖"}
+},900)
+}
+
+/* STRIP DOWNLOAD */
+function downloadStrip(){
+if(autoPhotos.length<4){alert("Pakai auto photo dulu!"); return}
+let c=document.createElement("canvas")
+let ctx2=c.getContext("2d")
+c.width=300
+c.height=900
+ctx2.fillStyle="#fff0f7"
+ctx2.fillRect(0,0,c.width,c.height)
+ctx2.strokeStyle="#ff6fa5"
+ctx2.lineWidth=8
+ctx2.strokeRect(0,0,c.width,c.height)
+for(let i=0;i<4;i++){
+let img=new Image()
+img.src=autoPhotos[i]
+}
+let url=c.toDataURL("image/png")
+let link=document.createElement("a")
+link.href=url
+link.download="strip_korea.png"
+document.body.appendChild(link)
+link.click()
+document.body.removeChild(link)
+setTimeout(()=>{
+let win=window.open()
+win.document.body.innerHTML="<img src='"+url+"' style='width:100%'>"
+},500)
+}
+
+/* TOMBOL KEMBALI KE CHAT */
+function backToChat(){
+window.location.href = "chat.html"; // ganti sesuai nama file chat-mu
+}
+</script>
+
+</body>
+</html>
